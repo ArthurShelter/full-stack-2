@@ -36,7 +36,7 @@ let topMovies = [
     },
     {
         title: 'I Heart Huckabees',
-        director: 'David O. Russel'
+        director: 'David O. Russell'
     },
     {
         title: 'Memories of Murder',
