@@ -54,7 +54,8 @@
                 Return data about a genre (description) by name/title (e.g., "Thriller");
             </td>
             <td>
-                /movies/genres/[genreName]
+                <!-- old /movies/genres/[genreName]-->
+                /movies/[genreName]
             </td>
             <td>
                 GET
@@ -67,7 +68,8 @@
                 Return data about a director (bio, birth year, death year) by name;
             </td>
             <td>
-                /movies/directors/[director]
+                <!-- old /movies/directors/[director]-->
+                /movies/[director]
             </td>
             <td>
                 GET
@@ -93,6 +95,7 @@
                 Allow users to update their user info (username);
             </td>
             <td>
+                <!-- is this right?-->
                 /users/:username
             </td>
             <td>
@@ -107,7 +110,8 @@
                 more on this later);
             </td>
             <td>
-                /movies/favorites/[Title]
+                <!--old /movies/favorites/[Title]-->
+                /users/FavoriteMovies/[Title]
             </td>
             <td>
                 PUT
@@ -121,7 +125,8 @@
                 removed - more on this later);
             </td>
             <td>
-                /movies/favorites/[Title]
+                <!--old /movies/favorites/[Title]-->
+                /users/FavoriteMovies/[Title]
             </td>
             <td>
                 DELETE
