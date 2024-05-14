@@ -41,7 +41,8 @@
                 by title to the user;
             </td>
             <td>
-                /movies/[Title]
+                <!-- capitalize title? -->
+                /movies/:title
             </td>
             <td>
                 GET
@@ -55,7 +56,7 @@
             </td>
             <td>
                 <!-- old /movies/genres/[genreName]-->
-                /movies/[genreName]
+                /movies/:genreName
             </td>
             <td>
                 GET
@@ -92,16 +93,15 @@
         </tr>
         <tr>
             <td>
-                Allow users to update their user info (username);
+                Allow users to update their user info by (username);
             </td>
             <td>
-                <!-- is this right?-->
-                /users/:username
+                /users/:Username
             </td>
             <td>
                 PUT
             </td>
-            <td>None</td>
+            <td>A JSON object containing all the new user information</td>
             <td>A confirmation message indicating the user and the data that was updated</td>
         </tr>
         <tr>
@@ -110,8 +110,7 @@
                 more on this later);
             </td>
             <td>
-                <!--old /movies/favorites/[Title]-->
-                /users/FavoriteMovies/[Title]
+                /users/:Username/movies/:MovieID
             </td>
             <td>
                 PUT
@@ -140,7 +139,7 @@
                 this later).
             </td>
             <td>
-                /users/[ID]
+                /users/:Username
             </td>
             <td>
                 DELETE

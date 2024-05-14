@@ -3,7 +3,9 @@
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
     "lodash": "^4.17.21",
-    "morgan": "^1.10.0"
+    "mongoose": "^8.3.4",
+    "morgan": "^1.10.0",
+    "uuid": "^9.0.1"
   },
   "scripts": {
     "start": "node index.js"
