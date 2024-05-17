@@ -10,6 +10,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+let auth = require('./auth')(app);
+const passport = require('passport');
+require('./passport');
+
+
 const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
@@ -35,8 +40,20 @@ app.get('/documentation', (req, res) => {
 });
 
 // Gets the list of data about all movies
-app.get('/movies', async (req, res) => {
-    await Movies.find()
+// app.get('/movies', passport.authenticate('jwt', {session: false} ), async (req, res) => {
+//     await Movies.find()
+//     .then((movies) => {
+//         res.status(201).json(movies);
+//     })
+//     .catch((err) => {
+//         console.error(err);
+//         res.status(500).send("Error: " + err);
+//     })
+// });
+
+// non-redundant version
+app.get('/movies', passport.authenticate('jwt', {session: false} ), (req, res) => {
+    Movies.find()
     .then((movies) => {
         res.status(201).json(movies);
     })
@@ -47,8 +64,19 @@ app.get('/movies', async (req, res) => {
 });
 
 // Gets the data about a single movie (by title)
-app.get('/movies/:title', async (req, res) => {
-    await Movies.findOne({Title: req.params.title})
+// app.get('/movies/:title', async (req, res) => {
+//     await Movies.findOne({Title: req.params.title})
+//     .then((movies) => {
+//         res.status(201).json(movies);
+//     })
+//     .catch((err) => {
+//         console.error(err);
+//         res.status(500).send("Error: " + err);
+//     })
+// });
+//non-redundant version
+app.get('/movies/:title', (req, res) => {
+    Movies.findOne({Title: req.params.title})
     .then((movies) => {
         res.status(201).json(movies);
     })
@@ -59,8 +87,8 @@ app.get('/movies/:title', async (req, res) => {
 });
 
 // Gets the data about a genre by name of genre
-app.get('/movies/genres/:genre', async (req, res) => {
-    await Movies.findOne({"Genre.Name": req.params.genre})
+app.get('/movies/genres/:genre', (req, res) => {
+    Movies.findOne({"Genre.Name": req.params.genre})
     .then((movie) => {
         res.status(201).json(movie.Genre);
     })
@@ -71,8 +99,8 @@ app.get('/movies/genres/:genre', async (req, res) => {
 });
 
 // Get data about a director (bio, birth year, death year) by name;
-app.get('/movies/directors/:director', async (req, res) => {
-    await Movies.findOne({"Director.Name": req.params.director})
+app.get('/movies/directors/:director', (req, res) => {
+    Movies.findOne({"Director.Name": req.params.director})
     .then((movie) => {
         res.status(201).json(movie.Director);
     })
@@ -83,8 +111,8 @@ app.get('/movies/directors/:director', async (req, res) => {
 });
 
 // Get all users
-app.get('/users', async (req, res) => {
-    await Users.find()
+app.get('/users', (req, res) => {
+    Users.find()
         .then((users) => {
             res.status(201).json(users);
         })
@@ -95,8 +123,8 @@ app.get('/users', async (req, res) => {
 });
 
 // Get specific user
-app.get('/users/:Username', async (req, res) => {
-    await Users.findOne({ Username: req.params.Username })
+app.get('/users/:Username', (req, res) => {
+    Users.findOne({ Username: req.params.Username })
         .then((user) => {
             res.json(user);
         })
@@ -154,8 +182,8 @@ app.post('/users', async (req, res) => {
   (required)
   BirthDate: Date
 }*/
-app.put('/users/:Username', async (req, res) => {
-    await Users.findOneAndUpdate({ Username: req.params.Username },
+app.put('/users/:Username', (req, res) => {
+    Users.findOneAndUpdate({ Username: req.params.Username },
         {
             $set:
             {
@@ -177,8 +205,8 @@ app.put('/users/:Username', async (req, res) => {
 
 
 // Allow users to add a movie to their list of favorites (showing only a text that a movie has been added - more on this later);
-app.put('/users/:Username/movies/:MovieID', async (req, res) => {
-    await Users.findOneAndUpdate({ Username: req.params.Username },
+app.put('/users/:Username/movies/:MovieID', (req, res) => {
+    Users.findOneAndUpdate({ Username: req.params.Username },
         {
             // note to self: consider replacing $push with $addToSet to avoid duplicates
             $push: { FavoriteMovies: req.params.MovieID }
@@ -194,8 +222,8 @@ app.put('/users/:Username/movies/:MovieID', async (req, res) => {
 });
 
 // Allow users to remove a movie from their list of favorites (showing only a text that a movie has been removed - more on this later);
-app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
-    await Users.findOneAndUpdate({ Username: req.params.Username },
+app.delete('/users/:Username/movies/:MovieID', (req, res) => {
+    Users.findOneAndUpdate({ Username: req.params.Username },
         {
             $pull: { FavoriteMovies: req.params.MovieID }
         },
@@ -210,8 +238,8 @@ app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
 });
 
 // Allow existing users to deregister (showing only a text that a user email has been removed - more on this later).
-app.delete('/users/:Username', async (req, res) => {
-    await Users.findOneAndDelete({ Username: req.params.Username })
+app.delete('/users/:Username', (req, res) => {
+    Users.findOneAndDelete({ Username: req.params.Username })
         .then((user) => {
             if (!user) {
                 res.status(400).send(req.params.Username + ' was not found');
