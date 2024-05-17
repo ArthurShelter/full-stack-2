@@ -19,8 +19,8 @@ passport.use(
             .then((user) => {
                 if (!user) {
                     console.log('incorrect username');
+                    //maybe should be just "incorrect username"
                     return callback(null, false, {
-                        //maybe should be just username
                         message: 'Incorrect username or password,',
                     });
                 }
