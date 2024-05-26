@@ -38,11 +38,10 @@ const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Directors;
 
-mongoose.connect('mongodb://localhost:27017/movieMongoDB', { useNewUrlParser: true, useUnifiedTopology: true });
-
-// not needed because these lines are up there
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+//local
+// mongoose.connect('mongodb://localhost:27017/movieMongoDB', { useNewUrlParser: true, useUnifiedTopology: true });
+//heroku
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(morgan('common'));
 
