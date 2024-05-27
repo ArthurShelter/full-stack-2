@@ -8,11 +8,13 @@ const express = require('express'),
 
 const app = express();
 
+const cors = require('cors');
+app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const cors = require('cors');
-app.use(cors());
+
 // if you only want to use certain origins, replace the immediate above line with this code
 // let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
 // app.use(cors({
