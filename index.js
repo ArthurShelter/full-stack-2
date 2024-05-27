@@ -41,7 +41,7 @@ const Directors = Models.Directors;
 //local
 // mongoose.connect('mongodb://localhost:27017/movieMongoDB', { useNewUrlParser: true, useUnifiedTopology: true });
 //heroku
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(morgan('common'));
 
@@ -51,10 +51,16 @@ app.get('/', (req, res) => {
     res.send('Welcome to my movie app!');
 });
 
+// app.get("/", passport.authenticate("jwt", { session: false }), (req, res) => {
+//     res.send("Welcome to my movie database.");
+//   });
+
+
 // Because of express.static('public), adding the full file path isn't necessary.
 app.get('/documentation', (req, res) => {
     res.sendFile('public/documentation.html', { root: __dirname });
 });
+
 
 app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
     Movies.find()
@@ -210,7 +216,6 @@ app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (r
             res.status(500).send('Error: ' + err);
         })
 });
-
 
 // Allow users to add a movie to their list of favorites (showing only a text that a movie has been added - more on this later);
 app.put('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
