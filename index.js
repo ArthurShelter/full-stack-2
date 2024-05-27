@@ -6,6 +6,7 @@ const express = require('express'),
     Models = require('./models.js'),
     { check, validationResult } = require('express-validator');
 
+require('dotenv').config()
 const app = express();
 
 const cors = require('cors');
@@ -43,7 +44,14 @@ const Directors = Models.Directors;
 //local
 // mongoose.connect('mongodb://localhost:27017/movieMongoDB', { useNewUrlParser: true, useUnifiedTopology: true });
 //heroku
-mongoose.connect( process.env.CONNECTION_URI);
+mongoose.connect(process.env.CONNECTION_URI)
+.then(() => { 
+    console.log("mongodb connected")
+})
+.catch(err => {
+    console.log("Error connecting to mongodb")
+    console.log(err)
+})
 
 app.use(morgan('common'));
 
@@ -111,21 +119,28 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
 });
 
 // Get all users
-app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Users.find()
-        .then((users) => {
-            res.status(201).json(users);
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error: ' + err);
-        });
-});
+// There should never be a route like this in your app
+// app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
+//     Users.find()
+//         .then((users) => {
+//             res.status(201).json(users);
+//         })
+//         .catch((err) => {
+//             console.error(err);
+//             res.status(500).send('Error: ' + err);
+//         });
+// });
 
+/**
+ * Passing the username in the url isnt the best.
+ * The backend will reject if token is not there or inactive
+ * so just use the decoded token info stored in req.user
+ */
 // Get specific user
-app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
-    Users.findOne({ Username: req.params.Username })
+app.get('/user', passport.authenticate('jwt', { session: false }), (req, res) => {
+    Users.findOne({ _id: req.user._id })
         .then((user) => {
+            console.log(user)
             res.json(user);
         })
         .catch((err) => {
@@ -195,11 +210,14 @@ app.post('/users',
   (required)
   BirthDate: Date
 }*/
-app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if (req.user.Username !== req.params.Username) {
-        return res.status(400).send('Permission denied');
-    }
-    Users.findOneAndUpdate({ Username: req.params.Username },
+app.put('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
+  //dont do this
+    // if (req.user.Username !== req.params.Username) {
+    //     return res.status(400).send('Permission denied');
+    // }
+
+    //instead remove the /:Username from the url and use the user from the token.
+    Users.findOneAndUpdate({ _id: req.user._id },
         {
             $set:
             {
@@ -220,11 +238,12 @@ app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (r
 });
 
 // Allow users to add a movie to their list of favorites (showing only a text that a movie has been added - more on this later);
-app.put('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if (req.user.Username !== req.params.Username) {
-        return res.status(400).send('Permission denied');
-    }
-    Users.findOneAndUpdate({ Username: req.params.Username },
+app.put('/users/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
+    // if (req.user.Username !== req.params.Username) {
+    //     return res.status(400).send('Permission denied');
+    // }
+    // use the info from the token
+    Users.findOneAndUpdate({ _id: req.user._id },
         {
             $addToSet: { FavoriteMovies: req.params.MovieID }
         },
@@ -239,11 +258,11 @@ app.put('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { sessi
 });
 
 // Allow users to remove a movie from their list of favorites (showing only a text that a movie has been removed - more on this later);
-app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if (req.user.Username !== req.params.Username) {
-        return res.status(400).send('Permission denied');
-    }
-    Users.findOneAndUpdate({ Username: req.params.Username },
+app.delete('/users/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
+    // if (req.user.Username !== req.params.Username) {
+    //     return res.status(400).send('Permission denied');
+    // }
+    Users.findOneAndUpdate({ _id: req.user._id },
         {
             $pull: { FavoriteMovies: req.params.MovieID }
         },
@@ -258,16 +277,16 @@ app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { se
 });
 
 // Allow existing users to deregister (showing only a text that a user email has been removed - more on this later).
-app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if (req.user.Username !== req.params.Username) {
-        return res.status(400).send('Permission denied');
-    }
-    Users.findOneAndDelete({ Username: req.params.Username })
+app.delete('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
+    // if (req.user.Username !== req.params.Username) {
+    //     return res.status(400).send('Permission denied');
+    // }
+    Users.findOneAndDelete({ _id: req.user._id })
         .then((user) => {
             if (!user) {
-                res.status(400).send(req.params.Username + ' was not found');
+                res.status(400).send(req.user.Username + ' was not found');
             } else {
-                res.status(200).send(req.params.Username + ' was deleted.');
+                res.status(200).send(req.user.Username + ' was deleted.');
             }
         })
         .catch((err) => {

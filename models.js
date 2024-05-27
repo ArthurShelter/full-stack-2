@@ -34,6 +34,20 @@ userSchema.methods.validatePassword = function(password) {
     return bcrypt.compareSync(password, this.Password);
 };
 
+movieSchema.set('toJSON', {
+    transform: function (_, ret) {
+      delete ret.__v
+    }
+  })
+
+
+userSchema.set('toJSON', {
+    transform: function (_, ret) {
+      delete ret.__v
+      delete ret.Password // You shouldnt send the password to the end user. This will remove the password
+    }
+  })
+
 let Movie = mongoose.model('Movie', movieSchema);
 let User = mongoose.model('User', userSchema);
 
