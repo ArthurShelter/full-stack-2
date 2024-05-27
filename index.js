@@ -43,7 +43,7 @@ const Directors = Models.Directors;
 //local
 // mongoose.connect('mongodb://localhost:27017/movieMongoDB', { useNewUrlParser: true, useUnifiedTopology: true });
 //heroku
-mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect( process.env.CONNECTION_URI);
 
 app.use(morgan('common'));
 
