@@ -153,7 +153,8 @@ app.post('/users',
         check('Username', 'Username must contain only alphanumeric characters').isAlphanumeric(),
         check('Password', 'Password is required').not().isEmpty(),
         check('Email', 'What you have entered does not appear to be in a valid email format').isEmail()
-    ], async (req, res) => {
+    ],
+    async (req, res) => {
 
         //check the validation object for errors
         let errors = validationResult(req);
@@ -197,29 +198,36 @@ app.post('/users',
   (required)
   BirthDate: Date
 }*/
-app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if (req.user.Username !== req.params.Username) {
-        return res.status(400).send('Permission denied');
-    }
-    Users.findOneAndUpdate({ Username: req.params.Username },
-        {
-            $set:
+app.put('/users/:Username',
+    [
+        check('Username', 'Minimum username length of 5 characters').isLength({ min: 5 }),
+        check('Username', 'Username must contain only alphanumeric characters').isAlphanumeric(),
+        check('Password', 'Password is required').not().isEmpty(),
+        check('Email', 'What you have entered does not appear to be in a valid email format').isEmail()
+    ],
+    passport.authenticate('jwt', { session: false }), (req, res) => {
+        if (req.user.Username !== req.params.Username) {
+            return res.status(400).send('Permission denied');
+        }
+        Users.findOneAndUpdate({ Username: req.params.Username },
             {
-                Username: req.body.Username,
-                Password: req.body.Password,
-                Email: req.body.Email,
-                BirthDate: req.body.BirthDate
-            }
-        },
-        { new: true }) // This lines makes sure the updated document is returned
-        .then((updatedUser) => {
-            res.json(updatedUser)
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send('Error: ' + err);
-        })
-});
+                $set:
+                {
+                    Username: req.body.Username,
+                    Password: req.body.Password,
+                    Email: req.body.Email,
+                    BirthDate: req.body.BirthDate
+                }
+            },
+            { new: true }) // This lines makes sure the updated document is returned
+            .then((updatedUser) => {
+                res.json(updatedUser)
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error: ' + err);
+            })
+    });
 
 // Allow users to add a movie to their list of favorites (showing only a text that a movie has been added - more on this later);
 app.put('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
