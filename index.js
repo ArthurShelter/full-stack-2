@@ -198,14 +198,15 @@ app.post('/users',
   (required)
   BirthDate: Date
 }*/
-app.put('/users/:Username',
+app.put('/users/:Username', 
     [
         check('Username', 'Minimum username length of 5 characters').isLength({ min: 5 }),
         check('Username', 'Username must contain only alphanumeric characters').isAlphanumeric(),
         check('Password', 'Password is required').not().isEmpty(),
         check('Email', 'What you have entered does not appear to be in a valid email format').isEmail()
-    ],
-    passport.authenticate('jwt', { session: false }), (req, res) => {
+    ], 
+    passport.authenticate('jwt', { session: false }), 
+    (req, res) => {
         if (req.user.Username !== req.params.Username) {
             return res.status(400).send('Permission denied');
         }
