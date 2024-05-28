@@ -213,6 +213,12 @@ app.put('/users/:Username',
     ], 
     passport.authenticate('jwt', { session: false }), 
     async (req, res) => {
+        let errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        let hashedPassword = Users.hashPassword(req.body.Password);
+
         if (req.user.Username !== req.params.Username) {
             return res.status(400).send('Permission denied');
         }
@@ -221,14 +227,14 @@ app.put('/users/:Username',
                 $set:
                 {
                     Username: req.body.Username,
-                    Password: req.body.Password,
+                    Password: hashedPassword,
                     Email: req.body.Email,
                     BirthDate: req.body.BirthDate
                 }
             },
             { new: true }) // This lines makes sure the updated document is returned
             .then((updatedUser) => {
-                res.json(updatedUser)
+                res.status(201).json(updatedUser);
             })
             .catch((err) => {
                 console.error(err);
