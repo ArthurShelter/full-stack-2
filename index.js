@@ -206,7 +206,7 @@ app.put('/users/:Username',
         check('Email', 'What you have entered does not appear to be in a valid email format').isEmail()
     ], 
     passport.authenticate('jwt', { session: false }), 
-    (req, res) => {
+    async (req, res) => {
         if (req.user.Username !== req.params.Username) {
             return res.status(400).send('Permission denied');
         }
