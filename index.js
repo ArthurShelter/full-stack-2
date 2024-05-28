@@ -45,8 +45,13 @@ const Directors = Models.Directors;
 //local
 // mongoose.connect('mongodb://localhost:27017/movieMongoDB', { useNewUrlParser: true, useUnifiedTopology: true });
 //heroku
-mongoose.connect(process.env.CONNECTION_URI);
+mongoose.connect(process.env.CONNECTION_URI).then(() => {
+    console.log('Database connected successfully');
+  }).catch(err => {
+    console.error('Database connection error:', err);
+  });
 
+//logger middleware
 app.use(morgan('common'));
 
 app.use(express.static('public'));
@@ -113,6 +118,7 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
 });
 
 // Get all users
+// for testing purposes
 app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.find()
         .then((users) => {
