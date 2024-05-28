@@ -7,7 +7,7 @@ const express = require('express'),
     { check, validationResult } = require('express-validator');
 
 
-// require('dotenv').config()
+require('dotenv').config();
 const app = express();
 
 const cors = require('cors');
