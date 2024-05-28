@@ -6,6 +6,8 @@ const express = require('express'),
     Models = require('./models.js'),
     { check, validationResult } = require('express-validator');
 
+
+require('dotenv').config();
 const app = express();
 
 const cors = require('cors');
