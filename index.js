@@ -129,6 +129,10 @@ app.get('/movies/directors/:director', passport.authenticate('jwt', { session: f
 
 // Get specific user
 app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
+    if (req.user.Username !== req.params.Username) {
+        return res.status(403).send('Access forbidden: You can only access your own information.');
+    }
+    else {
     Users.findOne({ Username: req.params.Username })
         .then((user) => {
             res.json(user);
@@ -137,6 +141,7 @@ app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (r
             console.error(err);
             res.status(500).send('Error: ' + err);
         });
+    }
 });
 
 //Add a user
